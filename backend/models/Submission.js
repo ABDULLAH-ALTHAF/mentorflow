@@ -19,8 +19,8 @@ const submissionSchema = new mongoose.Schema({
   },
   status: { 
     type: String, 
-    enum: ['submitted', 'graded', 'returned'],
-    default: 'submitted'
+    enum: ['pending', 'submitted', 'graded', 'returned'],
+    default: 'pending'
   },
   grade: { 
     type: Number,
@@ -29,6 +29,15 @@ const submissionSchema = new mongoose.Schema({
   },
   feedback: { 
     type: String 
+  },
+  feedbackVoice: { 
+    type: String // URL to voice feedback
+  },
+  submittedAt: { 
+    type: Date 
+  },
+  gradedAt: { 
+    type: Date 
   }
 }, { timestamps: true });
 

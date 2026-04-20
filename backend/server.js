@@ -10,6 +10,7 @@ const classRoutes = require('./routes/class');
 const homeworkRoutes = require('./routes/homework');
 const messageRoutes = require('./routes/message');
 const noteRoutes = require('./routes/notes'); // Add this line
+const notificationRoutes = require('./routes/notifications');
 const path = require('path');
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.use('/api/classes', classRoutes);
 app.use('/api/homework', homeworkRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notes', noteRoutes); // Add this line
+app.use('/api/notifications', notificationRoutes);
 
 // Basic health route
 app.get('/', (req, res) => {
@@ -48,6 +50,12 @@ app.get('/', (req, res) => {
 // Socket.io for real-time chat (class rooms)
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+
+  // Add user to their personal room for notifications
+socket.on('user_connected', (userId) => {
+  socket.join(`user_${userId}`);
+  console.log(`User ${userId} joined their personal room`);
+});
 
   // Join a class room
   socket.on('join_class', ({ classId, userId }) => {
