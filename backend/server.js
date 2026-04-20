@@ -9,6 +9,8 @@ const authRoutes = require('./routes/auth');
 const classRoutes = require('./routes/class');
 const homeworkRoutes = require('./routes/homework');
 const messageRoutes = require('./routes/message');
+const noteRoutes = require('./routes/notes'); // Add this line
+const path = require('path');
 
 dotenv.config();
 
@@ -36,6 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/homework', homeworkRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/notes', noteRoutes); // Add this line
 
 // Basic health route
 app.get('/', (req, res) => {
@@ -84,6 +87,49 @@ io.on('connection', (socket) => {
     console.log('User disconnected:', socket.id);
   });
 });
+
+// Add this after your existing routes, before server.listen
+// Better file serving with error handling
+app.get('/uploads/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filepath = path.join(__dirname, 'uploads', filename);
+  
+  // Check if file exists
+  const fs = require('fs');
+  if (!fs.existsSync(filepath)) {
+    console.error('File not found:', filepath);
+    return res.status(404).json({ error: 'File not found' });
+  }
+  
+  // Send file for download
+  res.download(filepath, filename, (err) => {
+    if (err) {
+      console.error('Download error:', err);
+      res.status(500).json({ error: 'Download failed' });
+    }
+  });
+});
+
+
+
+// Debug endpoint - REMOVE IN PRODUCTION
+app.get('/api/debug/files', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  const uploadsDir = path.join(__dirname, 'uploads');
+  
+  fs.readdir(uploadsDir, (err, files) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ 
+      uploadsFolder: uploadsDir,
+      files: files 
+    });
+  });
+});
+
+
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

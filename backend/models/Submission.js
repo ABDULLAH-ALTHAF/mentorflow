@@ -11,14 +11,25 @@ const submissionSchema = new mongoose.Schema({
     ref: 'User', 
     required: true 
   },
-  file: { type: String },        // uploaded file path/URL
-  text: { type: String },
+  file: { 
+    type: String 
+  },
+  text: { 
+    type: String 
+  },
   status: { 
     type: String, 
-    enum: ['submitted', 'graded'], 
-    default: 'submitted' 
+    enum: ['submitted', 'graded', 'returned'],
+    default: 'submitted'
   },
-  feedback: { type: String }
+  grade: { 
+    type: Number,
+    min: 0,
+    max: 100
+  },
+  feedback: { 
+    type: String 
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Submission', submissionSchema);

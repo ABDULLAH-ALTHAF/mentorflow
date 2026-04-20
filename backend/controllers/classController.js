@@ -75,4 +75,26 @@ const getMyClasses = async (req, res) => {
   }
 };
 
-module.exports = { createClass, joinClass, getMyClasses };
+// Add this new function to get class users (teachers and students)
+const getClassUsers = async (req, res) => {
+  const { classId } = req.params;
+  
+  try {
+    const classData = await Class.findById(classId)
+      .populate('teacherId', 'name email role')
+      .populate('students', 'name email role');
+    
+    if (!classData) {
+      return res.status(404).json({ message: 'Class not found' });
+    }
+    
+    res.json({
+      teachers: [classData.teacherId],
+      students: classData.students
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createClass, joinClass, getMyClasses, getClassUsers };
